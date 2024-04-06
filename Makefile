@@ -6,9 +6,11 @@ TEST_DIR = tests
 EXTERNAL_DIR = external
 
 # Main program sources and executable
-SRCS = $(wildcard $(SRC_DIR)/*.cpp)
+MAIN_SRC = $(SRC_DIR)/main.cpp
+MAIN_OBJ = $(BIN_DIR)/main.o 
+SRCS = $(filter-out $(MAIN_SRC), $(wildcard $(SRC_DIR)/*.cpp))
 OBJS = $(SRCS:$(SRC_DIR)/%.cpp=$(BIN_DIR)/%.o)
-EXEC = $(BIN_DIR)/geohash
+EXEC = ./main
 
 # Test sources and executable
 TEST_SRCS = $(wildcard $(TEST_DIR)/*.cpp)
@@ -17,20 +19,24 @@ TEST_EXEC = $(BIN_DIR)/test_exe
 all: $(EXEC)
 	@echo "Compilation complete"
 
-# Compile and run tests
-test: $(TEST_SRCS)
-	$(CXX) $(CXXFLAGS) -I$(EXTERNAL_DIR) $^ -o $(TEST_EXEC)
-	@./$(TEST_EXEC)
-
 # Compile the main executable
-$(EXEC): $(OBJS)
+$(EXEC): $(MAIN_OBJ) $(OBJS)
 	@mkdir -p $(BIN_DIR)
-	$(CXX) $(CXXFLAGS) $(OBJS) -o $(EXEC)
+	$(CXX) $(CXXFLAGS) $^ -o $@
 
-# Compile source files to object files
+# Compile source files to object files for main
+%.o: $(SRC_DIR)/%.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+# Compile source files to object files for geohash
 $(BIN_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@mkdir -p $(BIN_DIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
+# Compile and run tests
+test: $(OBJS) $(TEST_SRCS)
+	$(CXX) $(CXXFLAGS) -I$(EXTERNAL_DIR) $^ -o $(TEST_EXEC)
+	@./$(TEST_EXEC)
+
 clean: 
-	@rm -rf $(BIN_DIR)
+	@rm -rf $(BIN_DIR) *.o $(EXEC)
