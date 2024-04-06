@@ -1,0 +1,21 @@
+# Ignore all object files
+*.o
+
+# Ignore all binaries
+*.exe
+*.out
+/bin/
+/bin/*
+
+# Ignore build directories
+/build/
+/build/*
+
+# Ignore other directories that contain generated or machine-specific files
+/obj/
+/obj/*
+/.vscode/  # If using Visual Studio Code's settings
+
+# Ignore specific machine-specific or personal files
+.DS_Store  # macOS folder view options
+*.swp      # Vim swap files
