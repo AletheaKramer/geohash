@@ -3,7 +3,7 @@
 #include "../include/geohash.h"
 
 TEST_CASE("geohash helpers") {
-    Geohash gh(19.036236263, 47.02345234657234, 6);
+    Geohash gh(47.02345234657234, 19.036236263, 6);
 
     std::vector<int> expectedX = {1, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0};
 
@@ -69,4 +69,17 @@ TEST_CASE("geohash helpers") {
     //     }
     // }
     CHECK(isEqual);
+
+    std::vector<int> expectedNums = {26, 2, 19, 13, 9, 0, 19, 15, 2, 22, 30, 13};
+
+    std::vector<int> resultNums = gh.convertToNum(resultGroups);
+
+    CHECK(expectedNums == resultNums);
+}
+
+TEST_CASE("Geohash") {
+    Geohash gh(47.02345234657234, 19.036236263, 6);
+    std::string resultGeo = gh.generateHash();
+    std::string expectedGeo = "u2me90";
+    CHECK(resultGeo == expectedGeo);
 }
