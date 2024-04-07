@@ -1,4 +1,4 @@
-#include "../include/geohash.h"
+#include "../include/location.h"
 
 #include <bitset>
 #include <iostream>
@@ -12,10 +12,21 @@ const char BASE32_CHARS[] = {
     'h', 'j', 'k', 'm', 'n', 'p', 'q', 'r',
     's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
 
-Geohash::Geohash(double latitude, double longitude, int precision) : latitude(latitude), longitude(longitude), precision(precision) {
+Location::Location(double latitude, double longitude, int precision) : latitude(latitude), longitude(longitude), precision(precision) {
+    if (latitude < -90.0 || latitude > 90.0) {
+        throw std::out_of_range("Latitude must be between -90 and 90 degrees.");
+    }
+
+    if (longitude < -180.0 || longitude > 180.0) {
+        throw std::out_of_range("Longitude must be between -180 and 180 degrees.");
+    }
+
+    if (precision < 1 || precision > 12) {
+        throw std::out_of_range("Precision must be between 1 and 12.");
+    }
 }
 
-std::string Geohash::generateHash() const {
+std::string Location::generateHash() const {
     std::string geohash;
 
     auto xbin = this->encodeX();
@@ -31,7 +42,7 @@ std::string Geohash::generateHash() const {
     return geohash.substr(0, precision);
 }
 
-std::vector<int> Geohash::encodeX() const {
+std::vector<int> Location::encodeX() const {
     std::vector<int> xbin;
     double xvals[3] = {-180, 0, 180};
 
@@ -49,7 +60,7 @@ std::vector<int> Geohash::encodeX() const {
     return xbin;
 }
 
-std::vector<int> Geohash::encodeY() const {
+std::vector<int> Location::encodeY() const {
     std::vector<int> ybin;
     double yvals[3] = {-90, 0, 90};
 
@@ -67,7 +78,7 @@ std::vector<int> Geohash::encodeY() const {
     return ybin;
 }
 
-std::vector<int> Geohash::interleave(std::vector<int> xbin, std::vector<int> ybin) const {
+std::vector<int> Location::interleave(std::vector<int> xbin, std::vector<int> ybin) const {
     std::vector<int> interleaved;
     for (int i = 0; i < 32; i++) {
         interleaved.push_back(xbin[i]);
@@ -76,7 +87,7 @@ std::vector<int> Geohash::interleave(std::vector<int> xbin, std::vector<int> ybi
     return interleaved;
 }
 
-std::vector<std::vector<int>> Geohash::split(std::vector<int> interleaved) const {
+std::vector<std::vector<int>> Location::split(std::vector<int> interleaved) const {
     std::vector<std::vector<int>> groups;
     std::vector<int> group;
 
@@ -91,7 +102,7 @@ std::vector<std::vector<int>> Geohash::split(std::vector<int> interleaved) const
     return groups;
 }
 
-std::vector<int> Geohash::convertToNum(std::vector<std::vector<int>> groups) const {
+std::vector<int> Location::convertToNum(std::vector<std::vector<int>> groups) const {
     std::vector<int> result;
 
     for (auto group : groups) {
